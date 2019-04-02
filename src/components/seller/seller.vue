@@ -1,6 +1,6 @@
 <template>
   <div>
-    goods
+    seller
   </div>
 </template>
 
