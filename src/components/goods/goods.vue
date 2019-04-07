@@ -15,7 +15,7 @@
             <h1 class="title">{{item.name}}</h1>
 
               <ul>
-                <li v-for="food in item.foods" class="food-item border-1px">
+                <li @click="selectFood(food,$event)" v-for="food in item.foods" class="food-item border-1px">
                     <div class="icon">
                       <img :src="food.icon">
                     </div>
@@ -23,7 +23,7 @@
                       <h2 class="name">{{food.name}}</h2>
                       <p class="desc">{{food.description}}</p>
                       <div class="extra">
-                        <span>月售{{food.sellCount}}份</span>
+                        <span class="count">月售{{food.sellCount}}份</span>
                         <span>好评率{{food.rating}}%</span>
                       </div>
 
@@ -36,12 +36,15 @@
               </ul>
         </li>
       </ul>
+
     </div>
   </div>
+  <food :food="selectedFood" v-ref:food></food>
 </template>
 
 <script type="text/ecmascript-6">
   const ERR_OK = 0;
+  import food from 'components/food/food';
   export default {
       props: {
           seller: {
@@ -50,7 +53,8 @@
       },
       data() {
           return {
-              goods: []
+              goods: [],
+              selectedFood: {}
           };
       },
       created() {
@@ -61,6 +65,16 @@
                 this.goods = response.data;
             }
           });
+      },
+      components: {
+          food
+      },
+      methods: {
+        selectFood(food, event) {
+          this.selectedFood = food;
+          console.log(this.selectedFood);
+          this.$refs.food.show();
+        }
       }
   };
 </script>
@@ -146,7 +160,7 @@
             margin-bottom: 8px
           .extra
             .count
-              margin-right: 12px
+              margin-right: 2px
           .price
             font-weight: 700
             line-height: 24px
