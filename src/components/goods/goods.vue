@@ -78,12 +78,18 @@
       },
       methods: {
         selectMenu(index, event) {
+          if (!event._constructed) {
+            return;
+          }
           let foodList = this.$els.foodsWrapper.getElementsByClassName('food-list-hook');
           let el = foodList[index];
           console.log('&&&&' + el);
           this.foodScroll.scrollToElement(el, 300);
         },
         selectFood(food, event) {
+          if (!event._constructed) {
+            return;
+          }
           this.selectedFood = food;
           console.log(this.selectedFood);
           this.$refs.food.show();
@@ -117,7 +123,7 @@
               for (let i = 0; i < this.listHeight.length; i++) {
                   let height1 = this.listHeight[i];
                   let height2 = this.listHeight[i + 1];
-                  if (!height2 && (this.scrollY >= height1 && this.scrollY < height2)) {
+                  if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
                       return i;
                   }
               }
@@ -155,7 +161,6 @@
           font-weight: 700
           .text
             border-none()
-
         .icon
           display:inline-block
           width: 12px
