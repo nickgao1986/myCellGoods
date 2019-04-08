@@ -2,16 +2,16 @@
   <div class="good">
     <div class="menu_wrapper" v-el:menu-wrapper>
       <ul>
-        <li v-for="item in goods" class="menu-item">
+        <li v-for="item in goods" class="menu-item" :class="{'current':currentIndex===$index}" @click="selectMenu($index,$event)">
           <span class="text border-1px">
             <span v-show="item.type > 0" class="icon" :class="classMap[item.type]"></span>{{item.name}}
           </span>
         </li>
       </ul>
     </div>
-    <div class="foods_wrapper" v-el="food-wrapper">
+    <div class="foods-wrapper" v-el:foods-wrapper>
       <ul>
-        <li v-for="item in goods" class="food-list">
+        <li v-for="item in goods" class="food-list food-list-hook">
             <h1 class="title">{{item.name}}</h1>
 
               <ul>
@@ -55,7 +55,9 @@
       data() {
           return {
               goods: [],
-              selectedFood: {}
+              selectedFood: {},
+              listHeight: [],
+              scrollY: 0
           };
       },
       created() {
@@ -66,6 +68,7 @@
                 this.goods = response.data;
                 this.$nextTick(() => {
                   this._initScroll();
+                  this._calculateHeight();
                 });
             }
           });
@@ -74,20 +77,53 @@
           food
       },
       methods: {
+        selectMenu(index, event) {
+          let foodList = this.$els.foodsWrapper.getElementsByClassName('food-list-hook');
+          let el = foodList[index];
+          console.log('&&&&' + el);
+          this.foodScroll.scrollToElement(el, 300);
+        },
         selectFood(food, event) {
           this.selectedFood = food;
           console.log(this.selectedFood);
           this.$refs.food.show();
         },
         _initScroll() {
+          console.log('initScroll');
           this.meunScroll = new BScroll(this.$els.menuWrapper, {
             click: true
           });
-          this.foodScroll = new BScroll(this.$els.foodWrapper, {
-              click: true
+          this.foodScroll = new BScroll(this.$els.foodsWrapper, {
+            probeType: 3
           });
+          this.foodScroll.on('scroll', (pos) => {
+            this.scrollY = Math.abs(Math.round(pos.y));
+          });
+        },
+        _calculateHeight() {
+          console.log('calculateHeight');
+          let foodList = this.$els.foodsWrapper.getElementsByClassName('food-list-hook');
+          let height = 0;
+          this.listHeight.push(height);
+          for (let i = 0; i < foodList.length; i++) {
+            let item = foodList[i];
+            height += item.clientHeight;
+            this.listHeight.push(height);
+          }
         }
-      }
+      },
+      computed: {
+          currentIndex() {
+              for (let i = 0; i < this.listHeight.length; i++) {
+                  let height1 = this.listHeight[i];
+                  let height2 = this.listHeight[i + 1];
+                  if (!height2 && (this.scrollY >= height1 && this.scrollY < height2)) {
+                      return i;
+                  }
+              }
+              return 0;
+          }
+        }
   };
 </script>
 
@@ -100,6 +136,7 @@
     top: 174px
     bottom:46px
     width:100%
+    overflow: hidden
     .menu_wrapper
       width: 80px
       flex:0 0 80px
@@ -110,6 +147,15 @@
         height: 54px
         padding: 0 12px
         line-height: 14px
+        &.current
+          position: relative
+          z-index: 10
+          margin-top: -1px
+          background: #fff
+          font-weight: 700
+          .text
+            border-none()
+
         .icon
           display:inline-block
           width: 12px
@@ -134,7 +180,7 @@
           vertical-align: middle
           border-1px(rgba(7,17,27,0.1))
           font-size: 12px
-    .foods_wrapper
+    .foods-wrapper
       flex:1
       .title
         padding-left: 14px
