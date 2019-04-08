@@ -39,12 +39,14 @@
 
     </div>
   </div>
+  <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   <food :food="selectedFood" v-ref:food></food>
 </template>
 
 <script type="text/ecmascript-6">
   const ERR_OK = 0;
   import food from 'components/food/food';
+  import shopcart from 'components/shopcart/shopcart';
   import BScroll from 'better-scroll';
   export default {
       props: {
@@ -74,7 +76,8 @@
           });
       },
       components: {
-          food
+          food,
+          shopcart
       },
       methods: {
         selectMenu(index, event) {
