@@ -102,7 +102,10 @@
           this.selectedFood = food;
         },
         _drop(target) {
-          this.$refs.shopcart.drop(target);
+          this.$nextTick(() => {
+            console.log(this.$refs.shopcart);
+            this.$refs.shopcart.drop(target);
+          });
         },
         _initScroll() {
           console.log('initScroll');
