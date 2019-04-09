@@ -34,12 +34,17 @@
         type: Array,
         default() {
           return [
-            {
-                price: 10,
-                count: 2
-            }
           ];
         }
+      },
+      deliveryPrice: {
+        type: Number,
+        default: 0
+      },
+      minPrice: {
+        type: Number,
+        default: 0
+      }
       },
       data() {
         return {
@@ -64,15 +69,6 @@
           fold: true
         };
       },
-      deliveryPrice: {
-        type: Number,
-        default: 0
-      },
-      minPrice: {
-        type: Number,
-        default: 0
-      }
-    },
     computed: {
         totalPrice() {
             let total = 0;
@@ -89,6 +85,7 @@
         return count;
       },
       payDesc() {
+        console.log('bbb' + this.balls);
         if (this.totalPrice === 0) {
             return this.minPrice + '元起送';
         } else if (this.totalPrice < this.minPrice) {
@@ -108,7 +105,6 @@
     },
     methods: {
       drop(el) {
-          console.log('ddd:', this);
         for (let i = 0; i < this.balls.length; i++) {
           let ball = this.balls[i];
           if (!ball.show) {
@@ -142,7 +138,7 @@
             enter(el) {
               /* eslint-disable no-unused-vars */
               let rf = el.offsetHeight;
-              this.nextTick(() => {
+              this.$nextTick(() => {
                 el.style.webkitTransform = 'translate3d(0,0,0)';
                 el.style.transform = 'translate3d(0,0,0)';
                 let inner = el.getElementsByClassName('inner-hook')[0];
