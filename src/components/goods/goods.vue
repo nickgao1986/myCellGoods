@@ -31,6 +31,10 @@
                         <span class="now">${{food.price}}</span>
                         <span class="old" v-show="food.oldPrice">${{food.oldPrice}}</span>
                       </div>
+
+                      <div class="cartcontrol-wrapper">
+                        <cartcontrol :food="food"></cartcontrol>
+                      </div>
                     </div>
                 </li>
               </ul>
@@ -38,8 +42,8 @@
       </ul>
 
     </div>
+    <shopcart v-ref:shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   </div>
-  <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   <food :food="selectedFood" v-ref:food></food>
 </template>
 
@@ -47,6 +51,7 @@
   const ERR_OK = 0;
   import food from 'components/food/food';
   import shopcart from 'components/shopcart/shopcart';
+  import cartcontrol from 'components/cartcontrol/cartcontrol';
   import BScroll from 'better-scroll';
   export default {
       props: {
@@ -77,7 +82,8 @@
       },
       components: {
           food,
-          shopcart
+          shopcart,
+          cartcontrol
       },
       methods: {
         selectMenu(index, event) {
@@ -94,8 +100,12 @@
             return;
           }
           this.selectedFood = food;
-          console.log(this.selectedFood);
-          this.$refs.food.show();
+        },
+        _drop(target) {
+          this.$nextTick(() => {
+            console.log('aaa', this.$refs.shopcart);
+            this.$refs.shopcart.drop(target);
+          });
         },
         _initScroll() {
           console.log('initScroll');
@@ -103,6 +113,7 @@
             click: true
           });
           this.foodScroll = new BScroll(this.$els.foodsWrapper, {
+            click: true,
             probeType: 3
           });
           this.foodScroll.on('scroll', (pos) => {
@@ -131,8 +142,25 @@
                   }
               }
               return 0;
-          }
+          },
+          selectFoods() {
+            console.log('aaaselectFoods');
+            let foods = [];
+            this.goods.forEach((good) => {
+             good.foods.forEach((food) => {
+              if (food.count) {
+                foods.push(food);
+              }
+            });
+          });
+          return foods;
         }
+        },
+      events: {
+       'cart.add'(target) {
+          this._drop(target);
+        }
+      }
   };
 </script>
 
