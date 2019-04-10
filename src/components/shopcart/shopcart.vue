@@ -1,6 +1,6 @@
 <template>
   <div class="shopcart">
-    <div class="content">
+    <div class="content" @click="toggleList">
       <div class="content-left">
         <div class="logo-wrapper">
           <div class="logo" :class="{'highlight':totalCount>0}">
@@ -19,15 +19,37 @@
         </div>
       </div>
     </div>
+
     <div class="ball-container">
       <div transition="drop" v-for="ball in balls" v-show="ball.show" class="ball">
         <div class="inner inner-hook"></div>
+      </div>
+    </div>
+
+    <div class="shopcast-list" v-show="listShow">
+      <div class="list-header">
+          <h1 class="title">购物车</h1>
+          <span class="empty">清空</span>
+      </div>
+      <div class="list-content">
+        <ul>
+          <li class="food1" v-for="food in selectFoods">
+              <span class="name">{{food.name}}</span>
+              <div class="price">
+                <span>{{food.price*food.count}}</span>
+              </div>
+              <div class="cartcontrol-wrapper">
+                <cartcontrol :food="food"></cartcontrol>
+              </div>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import cartcontrol from 'components/cartcontrol/cartcontrol';
   export default{
     props: {
       selectFoods: {
@@ -45,6 +67,9 @@
         type: Number,
         default: 0
       }
+      },
+      components: {
+        cartcontrol
       },
       data() {
         return {
@@ -101,6 +126,15 @@
          } else {
              return 'enough';
          }
+      },
+      listShow() {
+            console.log('this.fold=' + this.fold);
+            if (!this.totalCount) {
+              this.fold = true;
+              return false;
+            }
+            let show = !this.fold;
+            return show;
       }
     },
     methods: {
@@ -114,6 +148,12 @@
             return;
           }
         }
+      },
+      toggleList() {
+          if (!this.totalCount) {
+              return;
+          }
+          this.fold = !this.fold;
       }
     },
     transitions: {
@@ -255,11 +295,71 @@
         bottom: 22px
         z-index: 200
         &.drop-transition
-          transition all 0.4s
+          transition all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41)
           .inner
             width: 16px
             height: 16px
             border-radius 50%
             background: rgb(0,160,220)
-            transition all 0.4s
+            transition all 0.4s linear
+    .shopcast-list
+      width: 100%
+      height 258px
+      position fixed
+      bottom 48px
+      z-index: 100
+      left 0
+      .list-header
+        display: flex
+        position:relative
+        left: 0
+        top: 0
+        z-index: 50
+        background #f3f5f7
+        line-height 40px
+        width 100%
+        .title
+          align-items center
+          font-size 14px
+          font-weight 200
+          color: rgb(7,17,27)
+          text-align center
+          line-height 40px
+          margin-left 18px
+        .empty
+          flex 1
+          text-align right
+          color: rgb(0,160,220)
+          font-size 12px
+          line-height 40px
+          align-items center
+          margin-right 18px
+      .list-content
+        position relative
+        top 0
+        left 0
+        background-color #fff
+        height 218px
+        width 100%
+        .food1
+          width 100%
+          display flex
+          height 48px
+          align-items center
+          .name
+            display block
+            margin-left 18px
+            font-size 14px
+            text-align center
+            align-items center
+          .price
+            display block
+            font-size 14px
+            align-items center
+            margin-right: 12px
+            flex 1
+            text-align right
+          .cartcontrol-wrapper
+            display inline-block
+            margin-right 18px
   </style>
