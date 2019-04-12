@@ -1,5 +1,5 @@
 <template>
-  <div v-show="showFlag" class="food" transition="move">
+  <div v-show="showFlag" class="food" transition="move" v-el:food>
 
     <div class="food-content">
       <div class="image-header">
@@ -21,8 +21,27 @@
           <span class="old" v-show="food.oldPrice">${{food.oldPrice}}</span>
         </div>
 
+        <div class="cartcontrol-wrapper">
+          <cartcontrol :food="food"></cartcontrol>
+        </div>
+
+        <div @click="addFirst(food, $event)" class="buy" v-show="!food.count || food.count === 0" transition="fade">加入购物车</div>
+
       </div>
 
+      <split v-show="food.info"></split>
+      <div class="info" v-show="food.info">
+        <h1 class="title">商品信息</h1>
+        <p class="text">{{food.info}}</p>
+      </div>
+
+      <split v-show="food.info">
+      </split>
+
+      <div class="rating">
+        <h1 class="title">商品评价</h1>
+        <ratingselect :select-type="selectType" :only-content="OnlyContent" :desc="desc" :ratings="food.ratings"></ratingselect>
+      </div>
     </div>
   </div>
 
@@ -30,24 +49,61 @@
 </template>
 
 <script type="text/ecmascript-6">
+  import BScroll from 'better-scroll';
+  import cartcontrol from 'components/cartcontrol/cartcontrol';
+  import split from 'components/split/split';
+  import ratingselect from 'components/ratingselect/ratingselect';
+  import Vue from 'vue';
+  const ALL = 2;
   export default {
       props: {
           food: {
               type: Object
           }
       },
+      components: {
+        cartcontrol,
+        split,
+        ratingselect
+      },
       data() {
           return {
-              showFlag: false
+              showFlag: false,
+              selectType: ALL,
+              onlyContent: true,
+              desc: {
+              all: '全部',
+              positive: '推荐',
+              negative: '吐槽'
+            }
           };
       },
       methods: {
           show() {
               console.log('aaaafoodshow');
               this.showFlag = true;
+              this.All = true;
+              this.selectType = 0;
+              this.onlyContent = true;
+
+              this.$nextTick(() => {
+              if (!this.scroll) {
+                this.scroll = new BScroll(this.$els.food, {
+                  click: true
+                });
+              } else {
+                this.scroll.refresh();
+              }
+            });
           },
           hide() {
             this.showFlag = false;
+          },
+          addFirst(food, event) {
+            console.log('click');
+            this.$dispatch('cart.add', event.target);
+
+            Vue.set(this.food, 'count', 1);
           }
       }
   };
@@ -89,6 +145,7 @@
           color: #fff
     .content
       padding: 18px
+      position relative
       .title
         font-size: 14px
         font-weight: 700
@@ -117,4 +174,52 @@
           text-decoration: line-through
           font-size: 10px
           color: rgb(147, 153, 159)
+      .cartcontrol-wrapper
+        position absolute
+        right 12px
+        bottom 12px
+      .buy
+        position absolute
+        right 18px
+        bottom 18px
+        z-index 10
+        line-height 24px
+        height 24px
+        padding 0 12px
+        box-sizing border-box
+        font-size 10px
+        border-radius 12px
+        color #fff
+        background rgb(0,160,220)
+        &.fade-transition
+          transition: all 0.2s
+          opacity: 1
+        &.fade-enter, &.fade-leave
+          opacity: 0
+
+    .info
+      position relative
+      padding 18px
+      .title
+        color rgb(7,17,27)
+        font-weight 700
+        font-size 14px
+        margin-bottom 6px
+        line-height 14px
+      .text
+        font-weight 200
+        font-size 12px
+        line-height 24px
+        color rgb(77,85,93)
+        padding 0 8px
+
+
+    .rating
+      padding-top 18px
+      .title
+        line-height 14px
+        margin-left 18px
+        font-size 14px
+        color rgb(7,17,27)
+
 </style>
